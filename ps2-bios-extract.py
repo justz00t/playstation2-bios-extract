@@ -22,11 +22,11 @@ import os
 import sys
 
 
-def romOPEN (romfile):
+def romOPEN(romfile):
     print("Opening:" + romfile)
     romsize = os.path.getsize(romfile)
     #always 32Mbps
-    rom = open (romfile, 'rb')
+    rom = open(romfile, 'rb')
     return rom
 
 def findROMDIRSIZE( file , romsize ):
@@ -37,12 +37,12 @@ def findROMDIRSIZE( file , romsize ):
     b=[] #other ESET bytes
     d=[] #4 bytes where size is given in little-endian
     e=0 #File location after RESET e.g. 0x2705 for scph-10000
-    f = 0 # size value in big-endian
-    g = 0 #ROMDIR size
+    f=0 # size value in big-endian
+    g=0 #ROMDIR size
     h=0 #start ROMDIR (0x2700 for scph-10000)
     
     print("Searching for RESET module size")
-    for i in range (0, romsize): # Pass through the file
+    for i in range(0,romsize): # Pass through the file
         a = file.read(1)
         
         if (a[0]==0x52):  #R
@@ -71,8 +71,8 @@ def findROMDIRSIZE( file , romsize ):
 
 def fixSIZE16 ( size ):
      #Remainder of the division. 16-a=how many bytes to add
-    zza = size% 16
-    zzb = 16-zza
+    zza=size%16
+    zzb=16-zza
     if zza==0:
         return size
     else:
@@ -154,7 +154,7 @@ try:
     os.mkdir(moddir)
 except OSError as error: 
     exit     
-os.chdir (moddir)
+os.chdir(moddir)
 modules_count=countMODULES(romdir_location)
 print('Total modules:'+str(modules_count)+' from:0 to:' + str(modules_count-1))
 innum=input("Type module number or ALL to extract one or ALL modules:")
@@ -163,5 +163,5 @@ if innum=='ALL':
     extractModule (romfile, z, i)
 else:
     extractModule(romfile, z, int(innum))
-romfile.close ()
+romfile.close()
 input('Type anything to close')
