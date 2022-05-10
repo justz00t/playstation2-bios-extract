@@ -6,12 +6,12 @@
 #new directory will be created
 #copy modules list with numbers from console
 
-#Как работает:
-#находим модуль RESET в ROMDIR и по смещению определяем
-#конец первого и начало второго модуля
-#читаем второй модуль, который всегда является структурой ROMDIR
-#где расположены размеры всех остальных модулей и их название
-#Размеры выравниваются по 16 байтам
+#How does it work:
+# find the RESET module in ROMDIR and determine by offset
+#end of the first and beginning of the second module
+#read the second module, which is always a ROMDIR structure
+#where are the dimensions of all other modules and their name
+#Sizes are aligned on 16 bytes
 
 
 #to-do: implement 16bytes padding in parseROMDIR function - ok
@@ -22,27 +22,27 @@ import os
 import sys
 
 
-def romOPEN(romfile): 
+def romOPEN (romfile):
     print("Opening:" + romfile)
     romsize = os.path.getsize(romfile)
-    #всегда 32мбит
-    rom = open(romfile, 'rb')
+    #always 32Mbps
+    rom = open (romfile, 'rb')
     return rom
 
 def findROMDIRSIZE( file , romsize ):
-    #ROMDIR всегда за RESET
-    #Размер ROMDIR = размер всей таблицы + 16 нулевых байтов
-    i=0  #счетчик
-    a=0  #первый байт R
-    b=[] #остальные байты ESET
-    d=[] #4 байта где указан размер в little-endian
-    e=0  #Место в файле после RESET например 0x2705 для scph-10000
-    f=0  #значение размера в big-endian
-    g=0  #ROMDIR размер
-    h=0  #начало ROMDIR (0x2700 для scph-10000)
+    #ROMDIR is always behind RESET
+    #ROMDIR size = size of the entire table + 16 null bytes
+    i=0 #counter
+    a=0 #first byte R
+    b=[] #other ESET bytes
+    d=[] #4 bytes where size is given in little-endian
+    e=0 #File location after RESET e.g. 0x2705 for scph-10000
+    f = 0 # size value in big-endian
+    g = 0 #ROMDIR size
+    h=0 #start ROMDIR (0x2700 for scph-10000)
     
     print("Searching for RESET module size")
-    for i in range(0,romsize): #Проход по файлу
+    for i in range (0, romsize): # Pass through the file
         a = file.read(1)
         
         if (a[0]==0x52):  #R
@@ -63,16 +63,16 @@ def findROMDIRSIZE( file , romsize ):
                 print("ROMDIR size:" +hex (f))
 
 
-                #Возвращаем начало ROMDIR и его размер
+                #Return the start of ROMDIR and its size
                 return h,f
                 break
         a=[]
         b=[]
 
 def fixSIZE16 ( size ):
-     #Остаток от деления. 16-a=сколько байт добавить
-    zza=size%16
-    zzb=16-zza
+     #Remainder of the division. 16-a=how many bytes to add
+    zza = size% 16
+    zzb = 16-zza
     if zza==0:
         return size
     else:
@@ -80,9 +80,9 @@ def fixSIZE16 ( size ):
     
 
 def parseSIZE (file, offset):
-    file.seek((offset)) #переходим к байтам размера
-    d=(file.read(4)) #читаем их
-    f=int("0x"+ (d[::-1]).hex()  ,16) #меняем порядок байт
+    file.seek((offset)) #go to size bytes
+    d=(file.read(4)) #read them
+    f=int("0x"+ (d[::-1]).hex() ,16) #change byte order
     return f
 
 def countMODULES (romdir_location):
@@ -93,15 +93,15 @@ def countMODULES (romdir_location):
 def parseROMDIR(file, romdir_location ):
     print('Modules:')
     #print('')
-    i=0                 #Счетчик
-    a = romdir_location #Чтобы меньше писать
-    b=(((a[1])//16)-1)  #Число модулей
-    modules = []        #Модули
+    i=0 #Counter
+    a = romdir_location #To write less
+    b=(((a[1])//16)-1) #Number of modules
+    modules = [] # Modules
     c=''
     cc=''
-    #Название модуля для цикла
-    d=0                 #Размер модуля для цикла
-    e=0 #абсолютный offset для цикла
+    #Module name for loop
+    d=0 #Module size for loop
+    e=0 #absolute offset for loop
     temp=[]
     file.seek(a[0])
     for i in range (0,b):
@@ -110,7 +110,7 @@ def parseROMDIR(file, romdir_location ):
         print(str(i)+'.'+(cc))
         file.seek(file.tell()+2)
         #if (i==0) or (i==1) or (i==2) or (i==3):  #scph-70000 derived
-        #    d=parseSIZE (file, file.tell()) #размер RESET выровнен всегда
+        # d=parseSIZE (file, file.tell()) #RESET size is always aligned
         #else:
         d=parseSIZE (file, file.tell())
             
@@ -138,9 +138,9 @@ def extractModule(romfile, modules, module_number ):
     f.close()
 
 
-###Не используется:
+###Not used:
 #structROMDIR = {'name':10,'ext':2,'size':4}
-#Формат записей в ROMDIR
+#Format of records in ROMDIR
 
 #filename = 'rom.bin'
 
@@ -151,17 +151,17 @@ z=parseROMDIR(romfile, romdir_location)
 #print(z) romdir modules names, sizes and fixed offsets and sizes.
 moddir='modules-'+filename
 try: 
-    os.mkdir(moddir) 
+    os.mkdir(moddir)
 except OSError as error: 
     exit     
-os.chdir(moddir)
+os.chdir (moddir)
 modules_count=countMODULES(romdir_location)
 print('Total modules:'+str(modules_count)+' from:0 to:' + str(modules_count-1))
 innum=input("Type module number or ALL to extract one or ALL modules:")
 if innum=='ALL':
    for i in range(0,modules_count):
-    extractModule(romfile, z, i)
+    extractModule (romfile, z, i)
 else:
     extractModule(romfile, z, int(innum))
-romfile.close()
+romfile.close ()
 input('Type anything to close')
